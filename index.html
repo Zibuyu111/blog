@@ -1,0 +1,1675 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Null Log - Pixel Geek Blog</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --page-bg: #e9e3d6;
+        --bg: #25231f;
+        --panel: rgba(238, 232, 219, 0.92);
+        --panel-solid: #ece5d8;
+        --ink: #25231f;
+        --muted: #6f6a60;
+        --green: #2f7d58;
+        --cyan: #476b72;
+        --amber: #e85f1c;
+        --rose: #9b4a2c;
+        --line: rgba(45, 42, 36, 0.28);
+        --shadow: 5px 5px 0 rgba(45, 42, 36, 0.18);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+        margin: 0;
+      }
+
+      body {
+        background: var(--page-bg);
+        color: var(--ink);
+        font-family: "IBM Plex Mono", "Fira Code", "SFMono-Regular", Consolas,
+          "Liberation Mono", monospace;
+        letter-spacing: 0;
+        overflow-x: hidden;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      #pixi-stage {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        image-rendering: pixelated;
+      }
+
+      #pixi-stage canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        image-rendering: pixelated;
+      }
+
+      .screen {
+        min-height: 100vh;
+        position: relative;
+        z-index: 1;
+      }
+
+      .scanlines {
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        background:
+          linear-gradient(rgba(70, 62, 48, 0.012) 50%, rgba(255, 255, 255, 0.04) 50%),
+          linear-gradient(90deg, rgba(232, 95, 28, 0.014), rgba(60, 87, 90, 0.01));
+        background-size: 100% 4px, 6px 100%;
+        mix-blend-mode: multiply;
+        opacity: 0.24;
+      }
+
+      .layout {
+        width: min(1180px, calc(100% - 32px));
+        min-height: 100vh;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 286px minmax(0, 1fr);
+        gap: 22px;
+        padding: 28px 0 44px;
+      }
+
+      .sidebar,
+      .hero,
+      .post,
+      .panel {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 28px;
+        align-self: start;
+        min-height: calc(100vh - 56px);
+        padding: 18px;
+      }
+
+      .brand {
+        display: grid;
+        grid-template-columns: 52px minmax(0, 1fr);
+        gap: 14px;
+        align-items: center;
+        padding-bottom: 18px;
+        border-bottom: 2px solid var(--line);
+      }
+
+      .avatar {
+        width: 52px;
+        height: 52px;
+        position: relative;
+        background:
+          linear-gradient(90deg, transparent 0 10px, #cbc2b2 10px 42px, transparent 42px),
+          linear-gradient(#cbc2b2 0 10px, #e85f1c 10px 20px, #25231f 20px 30px, #476b72 30px 42px, #cbc2b2 42px);
+        border: 2px solid var(--ink);
+        box-shadow: 3px 3px 0 rgba(45, 42, 36, 0.24);
+      }
+
+      .avatar::before,
+      .avatar::after {
+        content: "";
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        top: 22px;
+        background: #25231f;
+      }
+
+      .avatar::before {
+        left: 14px;
+      }
+
+      .avatar::after {
+        right: 14px;
+      }
+
+      .name strong {
+        display: block;
+        color: var(--green);
+        font-size: 18px;
+        line-height: 1.1;
+        text-transform: uppercase;
+      }
+
+      .name span {
+        display: block;
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .nav {
+        display: grid;
+        gap: 8px;
+        padding: 18px 0;
+        border-bottom: 2px solid var(--line);
+      }
+
+      .nav a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 34px;
+        padding: 0 10px;
+        border: 1px solid transparent;
+      }
+
+      .nav a:hover,
+      .nav a:focus-visible {
+        border-color: var(--amber);
+        background: rgba(232, 95, 28, 0.08);
+        outline: none;
+      }
+
+      .nav a.active {
+        border-color: rgba(232, 95, 28, 0.72);
+        background: rgba(232, 95, 28, 0.10);
+        color: var(--amber);
+      }
+
+      .nav code {
+        color: var(--amber);
+        font-size: 12px;
+      }
+
+      .status {
+        padding-top: 18px;
+        display: grid;
+        gap: 14px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.65;
+      }
+
+      .status-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        border-bottom: 1px dashed rgba(45, 42, 36, 0.20);
+        padding-bottom: 8px;
+      }
+
+      .status-row b {
+        color: var(--cyan);
+      }
+
+      .signal {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--green);
+      }
+
+      .signal::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        background: var(--green);
+        box-shadow: 0 0 10px rgba(47, 125, 88, 0.45);
+        animation: blink 1.4s steps(2, end) infinite;
+      }
+
+      main {
+        display: grid;
+        gap: 22px;
+      }
+
+      .hero {
+        min-height: 378px;
+        display: grid;
+        align-content: end;
+        padding: 30px;
+        background:
+          linear-gradient(180deg, rgba(250, 247, 240, 0.34), rgba(224, 216, 203, 0.82)),
+          repeating-linear-gradient(90deg, rgba(45, 42, 36, 0.035) 0 1px, transparent 1px 16px),
+          var(--panel-solid);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 18px;
+        border: 1px solid rgba(45, 42, 36, 0.18);
+        pointer-events: none;
+        z-index: 3;
+      }
+
+      .hero-scene-canvas {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        image-rendering: pixelated;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        transition: opacity 160ms ease;
+      }
+
+      .hero.html-canvas-ready .hero-content {
+        opacity: 0;
+      }
+
+      .kicker {
+        width: fit-content;
+        max-width: 100%;
+        color: var(--bg);
+        background: var(--amber);
+        padding: 4px 8px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        box-shadow: 3px 3px 0 rgba(45, 42, 36, 0.20);
+      }
+
+      h1 {
+        max-width: 760px;
+        margin: 18px 0 12px;
+        font-size: clamp(36px, 8vw, 82px);
+        line-height: 0.94;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+
+      .hero p {
+        max-width: 680px;
+        margin: 0;
+        color: #5f5a50;
+        font-size: 15px;
+        line-height: 1.8;
+      }
+
+      .command {
+        margin-top: 22px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 38px;
+        max-width: 680px;
+        padding: 0 12px;
+        border: 1px solid rgba(232, 95, 28, 0.42);
+        background: rgba(255, 252, 244, 0.48);
+        color: var(--bg);
+        overflow: hidden;
+      }
+
+      .prompt {
+        color: var(--amber);
+        flex: 0 0 auto;
+      }
+
+      .typed {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .caret {
+        width: 9px;
+        height: 18px;
+        flex: 0 0 auto;
+        background: var(--amber);
+        animation: blink 1s steps(2, end) infinite;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 0 2px;
+      }
+
+      .section-head h2,
+      .panel h2 {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.2;
+        text-transform: uppercase;
+      }
+
+      .section-head h2 {
+        color: var(--amber);
+      }
+
+      .section-head span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .content-switcher {
+        position: relative;
+        min-height: 360px;
+      }
+
+      .section-transition-canvas {
+        display: block;
+        width: 100%;
+        min-height: 220px;
+        border: 0;
+        image-rendering: pixelated;
+      }
+
+      .section-templates {
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+        height: 0;
+        overflow: hidden;
+        visibility: hidden;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .switch-view {
+        width: 100%;
+      }
+
+      .posts {
+        display: grid;
+        gap: 12px;
+      }
+
+      .post {
+        display: grid;
+        grid-template-columns: 116px minmax(0, 1fr) auto;
+        gap: 18px;
+        align-items: center;
+        min-height: 108px;
+        padding: 18px;
+        transition: border-color 160ms ease, transform 160ms ease;
+      }
+
+      .post:hover {
+        border-color: rgba(232, 95, 28, 0.58);
+        transform: translate(-2px, -2px);
+      }
+
+      .date {
+        color: var(--amber);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .post h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        line-height: 1.25;
+      }
+
+      .post p {
+        margin: 0;
+        color: #5f5a50;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .tag {
+        color: #fff8ec;
+        background: var(--amber);
+        padding: 4px 8px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .grid-two {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 18px;
+      }
+
+      .panel {
+        padding: 20px;
+      }
+
+      .panel h2 {
+        margin-bottom: 16px;
+        color: var(--rose);
+      }
+
+      .terminal-list {
+        display: grid;
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .terminal-list li {
+        display: grid;
+        gap: 5px;
+        padding-left: 18px;
+        position: relative;
+        color: #5f5a50;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .terminal-list li::before {
+        content: ">";
+        position: absolute;
+        left: 0;
+        color: var(--amber);
+      }
+
+      .terminal-list b {
+        color: var(--ink);
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 0 9px;
+        border: 1px solid rgba(45, 42, 36, 0.18);
+        color: #3c3932;
+        background: rgba(255, 252, 244, 0.42);
+        font-size: 12px;
+      }
+
+      .footer {
+        padding: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .pixi-error {
+        position: fixed;
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        z-index: 3;
+        display: none;
+        padding: 12px;
+        border: 2px solid var(--amber);
+        background: #101317;
+        color: var(--amber);
+        box-shadow: var(--shadow);
+        font-size: 12px;
+      }
+
+      @keyframes blink {
+        0%,
+        48% {
+          opacity: 1;
+        }
+
+        49%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .layout {
+          grid-template-columns: 1fr;
+          width: min(100% - 24px, 680px);
+          padding-top: 12px;
+        }
+
+        .sidebar {
+          position: relative;
+          top: auto;
+          min-height: auto;
+        }
+
+        .nav {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .hero {
+          min-height: 420px;
+          padding: 24px;
+        }
+
+        .post {
+          grid-template-columns: 1fr;
+          align-items: start;
+        }
+
+        .tag {
+          width: fit-content;
+        }
+
+        .grid-two {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .layout {
+          width: calc(100% - 18px);
+        }
+
+        .brand {
+          grid-template-columns: 44px minmax(0, 1fr);
+        }
+
+        .avatar {
+          width: 44px;
+          height: 44px;
+        }
+
+        .nav {
+          grid-template-columns: 1fr;
+        }
+
+        h1 {
+          font-size: 35px;
+        }
+
+        .hero,
+        .panel,
+        .post,
+        .sidebar {
+          box-shadow: 3px 3px 0 #000;
+        }
+
+        .section-head {
+          display: grid;
+        }
+
+        .command {
+          font-size: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="pixi-stage" aria-hidden="true"></div>
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="screen">
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="brand">
+            <div class="avatar" aria-hidden="true"></div>
+            <div class="name">
+              <strong>Null Log</strong>
+              <span>personal notes from a small terminal</span>
+            </div>
+          </div>
+
+          <nav class="nav" aria-label="Primary">
+            <a href="#latest" data-view="latest" class="active" aria-current="page"><span>latest</span><code>01</code></a>
+            <a href="#projects" data-view="projects"><span>projects</span><code>02</code></a>
+            <a href="#stack" data-view="stack"><span>stack</span><code>03</code></a>
+            <a href="#contact" data-view="contact"><span>contact</span><code>04</code></a>
+          </nav>
+
+          <div class="status">
+            <div class="status-row"><span>mode</span><b>quiet build</b></div>
+            <div class="status-row"><span>focus</span><b>systems + UI</b></div>
+            <div class="status-row"><span>signal</span><span class="signal">online</span></div>
+            <p>
+              I write about tiny tools, graphics experiments, local-first
+              workflows, and the parts of software that feel like craft.
+            </p>
+          </div>
+        </aside>
+
+        <main>
+          <section class="hero" id="top">
+            <canvas class="hero-scene-canvas" id="hero-scene-canvas" aria-hidden="true"></canvas>
+            <div class="hero-content" id="hero-html-source">
+              <div class="kicker">pixel dispatch / v0.1</div>
+              <h1>Minimal notes for curious builders.</h1>
+              <p>
+                A compact blog shell for essays, lab notes, code sketches, and
+                weekend graphics experiments. Low noise, sharp edges, readable
+                text, and a slow signal field behind the page.
+              </p>
+              <div class="command" aria-label="Terminal line">
+                <span class="prompt">$</span>
+                <span class="typed" id="typed-line">booting personal archive</span>
+                <span class="caret" aria-hidden="true"></span>
+              </div>
+            </div>
+          </section>
+
+          <section class="content-switcher" id="content-switcher" aria-label="Blog sections">
+            <canvas class="section-transition-canvas" id="section-transition-canvas" aria-hidden="true"></canvas>
+            <div class="section-templates" id="section-templates" aria-hidden="true">
+              <section class="switch-view posts" data-view="latest">
+                <div class="section-head">
+                  <h2>Latest Entries</h2>
+                  <span>small posts, long half-life</span>
+                </div>
+
+                <article class="post">
+                  <time class="date" datetime="2026-06-21">2026.06.21<br />lab note</time>
+                  <div>
+                    <h3>Making interfaces that still work at 2 AM</h3>
+                    <p>
+                      Notes on contrast, density, keyboard paths, and keeping tool
+                      surfaces quiet enough for repeated use.
+                    </p>
+                  </div>
+                  <span class="tag">design</span>
+                </article>
+
+                <article class="post">
+                  <time class="date" datetime="2026-06-12">2026.06.12<br />field log</time>
+                  <div>
+                    <h3>A tiny render loop for ambient dashboards</h3>
+                    <p>
+                      Deterministic motion, low frame pressure, and a background
+                      that adds state without stealing attention.
+                    </p>
+                  </div>
+                  <span class="tag">graphics</span>
+                </article>
+
+                <article class="post">
+                  <time class="date" datetime="2026-05-29">2026.05.29<br />build log</time>
+                  <div>
+                    <h3>Local-first notes with plain files</h3>
+                    <p>
+                      A simple folder, a search index, and a few conventions beat
+                      most heavyweight personal knowledge stacks.
+                    </p>
+                  </div>
+                  <span class="tag">tools</span>
+                </article>
+              </section>
+
+              <section class="switch-view" data-view="projects">
+                <div class="section-head">
+                  <h2>Active Projects</h2>
+                  <span>experiments worth keeping warm</span>
+                </div>
+                <div class="grid-two">
+                  <div class="panel">
+                    <h2>Build Queue</h2>
+                    <ul class="terminal-list">
+                      <li>
+                        <b>glyph-cache</b>
+                        A bitmap typography playground for pixel UI experiments.
+                      </li>
+                      <li>
+                        <b>packet-notes</b>
+                        A tiny offline notebook for debugging distributed systems.
+                      </li>
+                      <li>
+                        <b>signal-garden</b>
+                        Ambient data visualization sketches with deliberately low FPS.
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="panel">
+                    <h2>Current Bias</h2>
+                    <ul class="terminal-list">
+                      <li><b>small surfaces</b> dense tools with calm motion.</li>
+                      <li><b>plain files</b> durable notes that survive migrations.</li>
+                      <li><b>visual systems</b> graphics that explain state quickly.</li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+
+              <section class="switch-view" data-view="stack">
+                <div class="section-head">
+                  <h2>Working Stack</h2>
+                  <span>tools that stay out of the way</span>
+                </div>
+                <div class="panel">
+                  <h2>Runtime</h2>
+                  <div class="chips">
+                    <span class="chip">TypeScript</span>
+                    <span class="chip">PixiJS v8</span>
+                    <span class="chip">WebGL</span>
+                    <span class="chip">SQLite</span>
+                    <span class="chip">CSS Grid</span>
+                    <span class="chip">CLI tools</span>
+                    <span class="chip">local-first</span>
+                    <span class="chip">pixel art</span>
+                  </div>
+                </div>
+              </section>
+
+              <section class="switch-view" data-view="contact">
+                <div class="section-head">
+                  <h2>Contact</h2>
+                  <span>quiet channels, useful signals</span>
+                </div>
+                <div class="panel footer">
+                  <h2>Open Port</h2>
+                  <ul class="terminal-list">
+                    <li><b>mail</b> hello@nulllog.dev</li>
+                    <li><b>source</b> local notebook, plain files, rough edges intact.</li>
+                    <li><b>status</b> building in public, quietly.</li>
+                  </ul>
+                </div>
+              </section>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div class="pixi-error" id="pixi-error">
+      PixiJS could not load. Keep pixi.min.js next to this HTML file.
+    </div>
+
+    <script src="./pixi.min.js"></script>
+    <script>
+      const typedLine = document.getElementById("typed-line");
+      const commands = [
+        "booting personal archive",
+        "rendering low-res signals",
+        "syncing notes from /lab",
+        "watching quiet systems",
+      ];
+      let commandIndex = 0;
+      let refreshHeroCapture = () => {};
+
+      setInterval(() => {
+        commandIndex = (commandIndex + 1) % commands.length;
+        typedLine.textContent = commands[commandIndex];
+        refreshHeroCapture();
+      }, 2600);
+
+      function startHeroHtmlCanvas() {
+        const hero = document.getElementById("top");
+        const canvas = document.getElementById("hero-scene-canvas");
+        const source = document.getElementById("hero-html-source");
+
+        if (!hero || !canvas || !source) {
+          return;
+        }
+
+        const ctx = canvas.getContext("2d", { alpha: true });
+
+        if (!ctx) {
+          return;
+        }
+
+        let width = 0;
+        let height = 0;
+        let dpr = 1;
+        let htmlImage = null;
+        let captureTimer = 0;
+        let captureVersion = 0;
+        const sampleCanvas = document.createElement("canvas");
+        const sampleCtx = sampleCanvas.getContext("2d", { willReadFrequently: true });
+        const glassCanvas = document.createElement("canvas");
+        const glassCtx = glassCanvas.getContext("2d");
+
+        function clamp(value, min, max) {
+          return Math.max(min, Math.min(max, value));
+        }
+
+        function snap(value, size) {
+          return Math.round(value / size) * size;
+        }
+
+        function resizeHeroCanvas() {
+          const rect = hero.getBoundingClientRect();
+          const nextWidth = Math.max(1, Math.round(rect.width));
+          const nextHeight = Math.max(1, Math.round(rect.height));
+          const nextDpr = Math.min(window.devicePixelRatio || 1, 2);
+
+          if (width === nextWidth && height === nextHeight && dpr === nextDpr) {
+            return;
+          }
+
+          width = nextWidth;
+          height = nextHeight;
+          dpr = nextDpr;
+          canvas.width = Math.round(width * dpr);
+          canvas.height = Math.round(height * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          requestHeroCapture();
+        }
+
+        function getCaptureCss() {
+          const titleStyle = window.getComputedStyle(source.querySelector("h1"));
+          const paragraphStyle = window.getComputedStyle(source.querySelector("p"));
+          const commandStyle = window.getComputedStyle(source.querySelector(".command"));
+
+          return `
+            * { box-sizing: border-box; }
+            .capture-root {
+              position: relative;
+              width: ${width}px;
+              height: ${height}px;
+              color: #25231f;
+              font-family: "IBM Plex Mono", "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+              letter-spacing: 0;
+            }
+            .hero-content {
+              position: absolute;
+              z-index: 2;
+              width: 100%;
+              opacity: 1;
+            }
+            .kicker {
+              width: fit-content;
+              max-width: 100%;
+              color: #fff8ec;
+              background: #e85f1c;
+              padding: 4px 8px;
+              font-size: 12px;
+              font-weight: 700;
+              text-transform: uppercase;
+              box-shadow: 3px 3px 0 rgba(45, 42, 36, 0.20);
+              line-height: normal;
+            }
+            h1 {
+              max-width: 760px;
+              margin: 18px 0 12px;
+              color: #25231f;
+              font-size: ${titleStyle.fontSize};
+              line-height: 0.94;
+              letter-spacing: 0;
+              text-transform: uppercase;
+              font-weight: ${titleStyle.fontWeight};
+            }
+            p {
+              max-width: 680px;
+              margin: 0;
+              color: #5f5a50;
+              font-size: ${paragraphStyle.fontSize};
+              line-height: ${paragraphStyle.lineHeight};
+            }
+            .command {
+              margin-top: 22px;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              min-height: 38px;
+              max-width: 680px;
+              padding: 0 12px;
+              border: 1px solid rgba(232, 95, 28, 0.42);
+              background: rgba(255, 252, 244, 0.48);
+              color: #25231f;
+              overflow: hidden;
+              font-size: ${commandStyle.fontSize};
+            }
+            .prompt {
+              color: #e85f1c;
+              flex: 0 0 auto;
+            }
+            .typed {
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+            .caret {
+              width: 9px;
+              height: 18px;
+              flex: 0 0 auto;
+              background: #e85f1c;
+            }
+          `;
+        }
+
+        function requestHeroCapture() {
+          window.clearTimeout(captureTimer);
+          captureTimer = window.setTimeout(captureHeroHtml, 80);
+        }
+
+        function captureHeroHtml() {
+          if (!width || !height) {
+            return;
+          }
+
+          const heroRect = hero.getBoundingClientRect();
+          const sourceRect = source.getBoundingClientRect();
+          const clone = source.cloneNode(true);
+          const version = ++captureVersion;
+
+          clone.removeAttribute("id");
+          clone.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+          clone.setAttribute(
+            "style",
+            [
+              "position:absolute",
+              `left:${Math.round(sourceRect.left - heroRect.left)}px`,
+              `top:${Math.round(sourceRect.top - heroRect.top)}px`,
+              `width:${Math.round(sourceRect.width)}px`,
+              "opacity:1",
+            ].join(";"),
+          );
+
+          const serialized = new XMLSerializer().serializeToString(clone);
+          const svg = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+              <foreignObject x="0" y="0" width="${width}" height="${height}">
+                <div xmlns="http://www.w3.org/1999/xhtml" class="capture-root">
+                  <style>${getCaptureCss()}</style>
+                  ${serialized}
+                </div>
+              </foreignObject>
+            </svg>
+          `;
+          const image = new Image();
+
+          image.onload = () => {
+            if (version !== captureVersion) {
+              return;
+            }
+
+            htmlImage = image;
+            hero.classList.add("html-canvas-ready");
+          };
+          image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        }
+
+        function drawHeroBase(time) {
+          ctx.save();
+          ctx.fillStyle = "rgba(236, 229, 216, 0.72)";
+          ctx.fillRect(0, 0, width, height);
+
+          for (let y = 0; y < height; y += 8) {
+            const alpha = 0.030 + Math.sin(time * 0.001 + y * 0.08) * 0.008;
+            ctx.fillStyle = `rgba(79, 75, 66, ${alpha})`;
+            ctx.fillRect(0, y, width, 1);
+          }
+
+          if (htmlImage) {
+            ctx.globalAlpha = 0.50;
+            ctx.drawImage(htmlImage, 0, 0, width, height);
+          }
+
+          ctx.restore();
+        }
+
+        function drawAsciiField(time) {
+          if (!htmlImage || !sampleCtx) {
+            return;
+          }
+
+          const stepX = width < 620 ? 10 : 12;
+          const stepY = width < 620 ? 12 : 14;
+          const sampleW = Math.max(1, Math.ceil(width / stepX));
+          const sampleH = Math.max(1, Math.ceil(height / stepY));
+          const glyphs = " .,:;irsXA253hMHGS#9B&@";
+
+          sampleCanvas.width = sampleW;
+          sampleCanvas.height = sampleH;
+          sampleCtx.clearRect(0, 0, sampleW, sampleH);
+          sampleCtx.fillStyle = "#ece5d8";
+          sampleCtx.fillRect(0, 0, sampleW, sampleH);
+          sampleCtx.drawImage(htmlImage, 0, 0, sampleW, sampleH);
+
+          const data = sampleCtx.getImageData(0, 0, sampleW, sampleH).data;
+          ctx.save();
+          ctx.font = `${width < 620 ? 9 : 10}px monospace`;
+          ctx.textBaseline = "top";
+          ctx.globalCompositeOperation = "multiply";
+
+          for (let y = 0; y < sampleH; y++) {
+            for (let x = 0; x < sampleW; x++) {
+              const i = (y * sampleW + x) * 4;
+              const brightness = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114) / 255;
+              const wave = (Math.sin(x * 0.58 + time * 0.003) + Math.cos(y * 0.42 - time * 0.002)) * 0.09;
+              const level = clamp(1 - brightness + wave, 0, 1);
+
+              if (level < 0.18 && (x + y + Math.floor(time / 280)) % 13 !== 0) {
+                continue;
+              }
+
+              const glyph = glyphs[Math.floor(level * (glyphs.length - 1))];
+              const px = x * stepX;
+              const py = y * stepY;
+
+              if (level > 0.62) {
+                ctx.fillStyle = `rgba(37, 35, 31, ${0.14 + level * 0.34})`;
+              } else if ((x + y + Math.floor(time / 180)) % 5 === 0) {
+                ctx.fillStyle = `rgba(232, 95, 28, ${0.08 + level * 0.18})`;
+              } else {
+                ctx.fillStyle = `rgba(71, 107, 114, ${0.05 + level * 0.14})`;
+              }
+
+              ctx.fillText(glyph, snap(px, 1), snap(py, 1));
+            }
+          }
+
+          ctx.restore();
+        }
+
+        function drawLiquidShape(context, x, y, w, h, time, phase) {
+          const wobble = Math.sin(time * 0.0014 + phase) * 10;
+          const wobble2 = Math.cos(time * 0.0011 + phase * 1.7) * 8;
+
+          context.beginPath();
+          context.moveTo(x + w * 0.16, y + 10 + wobble * 0.3);
+          context.bezierCurveTo(x + w * 0.38, y - 10 + wobble, x + w * 0.78, y + 2 + wobble2, x + w - 10, y + h * 0.2);
+          context.bezierCurveTo(x + w + 8 + wobble2, y + h * 0.48, x + w * 0.86, y + h + 8, x + w * 0.6, y + h - 6 + wobble * 0.2);
+          context.bezierCurveTo(x + w * 0.34, y + h + 12 + wobble2, x - 8, y + h * 0.76, x + 4, y + h * 0.45);
+          context.bezierCurveTo(x + 12 + wobble, y + h * 0.22, x - 4, y + 14, x + w * 0.16, y + 10 + wobble * 0.3);
+          context.closePath();
+        }
+
+        function drawLiquidGlass(time) {
+          if (!glassCtx) {
+            return;
+          }
+
+          const shapes =
+            width < 620
+              ? [
+                  { x: width * 0.58, y: height * 0.62, w: width * 0.34, h: height * 0.22, phase: 0.3 },
+                  { x: width * 0.08, y: height * 0.08, w: width * 0.24, h: height * 0.12, phase: 2.1 },
+                ]
+              : [
+                  { x: width * 0.62, y: height * 0.16, w: width * 0.28, h: height * 0.22, phase: 0.2 },
+                  { x: width * 0.68, y: height * 0.56, w: width * 0.26, h: height * 0.23, phase: 1.5 },
+                  { x: width * 0.08, y: height * 0.08, w: width * 0.18, h: height * 0.12, phase: 2.9 },
+                ];
+
+          shapes.forEach((shape) => {
+            const sx = clamp(shape.x - 16, 0, width);
+            const sy = clamp(shape.y - 16, 0, height);
+            const sw = clamp(shape.w + 32, 1, width - sx);
+            const sh = clamp(shape.h + 32, 1, height - sy);
+
+            glassCanvas.width = Math.round(sw * dpr);
+            glassCanvas.height = Math.round(sh * dpr);
+            glassCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            glassCtx.clearRect(0, 0, sw, sh);
+            glassCtx.filter = "blur(10px) saturate(1.45) contrast(1.08)";
+            glassCtx.drawImage(
+              canvas,
+              Math.round(sx * dpr),
+              Math.round(sy * dpr),
+              Math.round(sw * dpr),
+              Math.round(sh * dpr),
+              -4 + Math.sin(time * 0.0012 + shape.phase) * 6,
+              -3 + Math.cos(time * 0.001 + shape.phase) * 5,
+              sw + 8,
+              sh + 8,
+            );
+            glassCtx.filter = "none";
+            glassCtx.fillStyle = "rgba(255, 252, 244, 0.16)";
+            glassCtx.fillRect(0, 0, sw, sh);
+
+            ctx.save();
+            drawLiquidShape(ctx, shape.x, shape.y, shape.w, shape.h, time, shape.phase);
+            ctx.clip();
+            ctx.globalAlpha = 0.78;
+            ctx.drawImage(glassCanvas, sx, sy, sw, sh);
+            ctx.globalCompositeOperation = "source-over";
+            ctx.fillStyle = "rgba(255, 252, 244, 0.18)";
+            ctx.fillRect(sx, sy, sw, sh);
+            ctx.strokeStyle = "rgba(45, 42, 36, 0.22)";
+            ctx.lineWidth = 1.4;
+            drawLiquidShape(ctx, shape.x + 0.5, shape.y + 0.5, shape.w - 1, shape.h - 1, time, shape.phase);
+            ctx.stroke();
+            ctx.strokeStyle = "rgba(232, 95, 28, 0.26)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(shape.x + shape.w * 0.18, shape.y + shape.h * 0.18);
+            ctx.bezierCurveTo(
+              shape.x + shape.w * 0.42,
+              shape.y + shape.h * 0.02,
+              shape.x + shape.w * 0.68,
+              shape.y + shape.h * 0.08,
+              shape.x + shape.w * 0.82,
+              shape.y + shape.h * 0.28,
+            );
+            ctx.stroke();
+            ctx.restore();
+          });
+        }
+
+        function draw(time) {
+          resizeHeroCanvas();
+          ctx.clearRect(0, 0, width, height);
+          drawHeroBase(time);
+          drawAsciiField(time);
+          drawLiquidGlass(time);
+
+          window.requestAnimationFrame(draw);
+        }
+
+        if ("ResizeObserver" in window) {
+          new ResizeObserver(() => {
+            resizeHeroCanvas();
+            requestHeroCapture();
+          }).observe(hero);
+        } else {
+          window.addEventListener("resize", () => {
+            resizeHeroCanvas();
+            requestHeroCapture();
+          });
+        }
+
+        refreshHeroCapture = requestHeroCapture;
+        resizeHeroCanvas();
+        requestHeroCapture();
+        document.fonts?.ready.then(requestHeroCapture);
+        window.requestAnimationFrame(draw);
+      }
+
+      function startContentSwitcher() {
+        const switcher = document.getElementById("content-switcher");
+        const canvas = document.getElementById("section-transition-canvas");
+        const templates = document.getElementById("section-templates");
+
+        if (!switcher || !canvas || !templates) {
+          return;
+        }
+
+        const ctx = canvas.getContext("2d", { alpha: true, willReadFrequently: true });
+        const viewNames = ["latest", "projects", "stack", "contact"];
+        const navLinks = Array.from(document.querySelectorAll(".nav a[data-view]"));
+
+        if (!ctx) {
+          return;
+        }
+
+        let width = 0;
+        let height = 0;
+        let dpr = 1;
+        let currentView = "latest";
+        let currentBitmap = null;
+        let transitionId = 0;
+        let isAnimating = false;
+
+        function clamp(value, min, max) {
+          return Math.max(min, Math.min(max, value));
+        }
+
+        function easeInOut(value) {
+          const t = clamp(value, 0, 1);
+          return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
+
+        function getView(view) {
+          return templates.querySelector(`[data-view="${view}"]`);
+        }
+
+        function resizeSwitcher() {
+          const rect = switcher.getBoundingClientRect();
+          const nextWidth = Math.max(1, Math.round(rect.width));
+          const nextDpr = Math.min(window.devicePixelRatio || 1, 2);
+          const measuredHeight = Math.max(
+            260,
+            ...viewNames.map((view) => {
+              const element = getView(view);
+              return element ? Math.ceil(element.getBoundingClientRect().height) + 10 : 0;
+            }),
+          );
+
+          if (width === nextWidth && height === measuredHeight && dpr === nextDpr) {
+            return false;
+          }
+
+          width = nextWidth;
+          height = measuredHeight;
+          dpr = nextDpr;
+          canvas.width = Math.round(width * dpr);
+          canvas.height = Math.round(height * dpr);
+          canvas.style.height = `${height}px`;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          return true;
+        }
+
+        function getCaptureCss() {
+          const pageCss = document.querySelector("style")?.textContent || "";
+
+          return `
+            ${pageCss}
+            * { box-sizing: border-box; }
+            .capture-root {
+              position: relative;
+              width: ${width}px;
+              min-height: ${height}px;
+              color: #25231f;
+              font-family: "IBM Plex Mono", "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+              letter-spacing: 0;
+            }
+            .capture-root .switch-view {
+              position: relative;
+              width: ${width}px;
+              visibility: visible;
+              pointer-events: none;
+              z-index: 1;
+            }
+          `;
+        }
+
+        function captureView(view) {
+          const element = getView(view);
+
+          if (!element) {
+            return Promise.reject(new Error(`Missing view: ${view}`));
+          }
+
+          const clone = element.cloneNode(true);
+          clone.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+          clone.setAttribute("style", `width:${width}px;visibility:visible;`);
+
+          const serialized = new XMLSerializer().serializeToString(clone);
+          const svg = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+              <foreignObject x="0" y="0" width="${width}" height="${height}">
+                <div xmlns="http://www.w3.org/1999/xhtml" class="capture-root">
+                  <style>${getCaptureCss()}</style>
+                  ${serialized}
+                </div>
+              </foreignObject>
+            </svg>
+          `;
+
+          return new Promise((resolve, reject) => {
+            const image = new Image();
+
+            image.onload = () => {
+              const bitmap = document.createElement("canvas");
+              const bitmapCtx = bitmap.getContext("2d", { alpha: true, willReadFrequently: true });
+
+              if (!bitmapCtx) {
+                reject(new Error("No canvas context"));
+                return;
+              }
+
+              bitmap.width = canvas.width;
+              bitmap.height = canvas.height;
+              bitmapCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+              bitmapCtx.clearRect(0, 0, width, height);
+              bitmapCtx.drawImage(image, 0, 0, width, height);
+              resolve(bitmap);
+            };
+            image.onerror = reject;
+            image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+          });
+        }
+
+        function setActiveNav(view) {
+          navLinks.forEach((link) => {
+            const active = link.dataset.view === view;
+            link.classList.toggle("active", active);
+
+            if (active) {
+              link.setAttribute("aria-current", "page");
+            } else {
+              link.removeAttribute("aria-current");
+            }
+          });
+        }
+
+        function drawBitmap(bitmap) {
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          ctx.clearRect(0, 0, width, height);
+          ctx.drawImage(bitmap, 0, 0, width, height);
+        }
+
+        function waveWipe(fromBitmap, toBitmap, progress) {
+          const pixelWidth = canvas.width;
+          const pixelHeight = canvas.height;
+          const out = ctx.createImageData(pixelWidth, pixelHeight);
+          const fromCtx = fromBitmap.getContext("2d", { willReadFrequently: true });
+          const toCtx = toBitmap.getContext("2d", { willReadFrequently: true });
+
+          if (!fromCtx || !toCtx) {
+            return;
+          }
+
+          const from = fromCtx.getImageData(0, 0, pixelWidth, pixelHeight).data;
+          const to = toCtx.getImageData(0, 0, pixelWidth, pixelHeight).data;
+          const target = out.data;
+          const edgeBase = progress * (pixelWidth + 160 * dpr) - 80 * dpr;
+          const amplitude = 34 * dpr;
+          const softness = 28 * dpr;
+          const frequency = 0.035 / dpr;
+
+          for (let y = 0; y < pixelHeight; y++) {
+            const edge = edgeBase + Math.sin(y * frequency + progress * Math.PI * 4) * amplitude;
+
+            for (let x = 0; x < pixelWidth; x++) {
+              const i = (y * pixelWidth + x) * 4;
+              const mix = clamp((edge - x + softness) / (softness * 2), 0, 1);
+
+              target[i] = from[i] + (to[i] - from[i]) * mix;
+              target[i + 1] = from[i + 1] + (to[i + 1] - from[i + 1]) * mix;
+              target[i + 2] = from[i + 2] + (to[i + 2] - from[i + 2]) * mix;
+              target[i + 3] = from[i + 3] + (to[i + 3] - from[i + 3]) * mix;
+            }
+          }
+
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.putImageData(out, 0, 0);
+        }
+
+        async function renderCurrent() {
+          resizeSwitcher();
+          currentBitmap = await captureView(currentView);
+          drawBitmap(currentBitmap);
+        }
+
+        async function switchView(view) {
+          if (!viewNames.includes(view) || view === currentView || isAnimating) {
+            return;
+          }
+
+          const id = ++transitionId;
+          const changed = resizeSwitcher();
+
+          if (changed || !currentBitmap) {
+            currentBitmap = await captureView(currentView);
+          }
+
+          const nextBitmap = await captureView(view);
+
+          if (id !== transitionId) {
+            return;
+          }
+
+          setActiveNav(view);
+          isAnimating = true;
+          const start = performance.now();
+          const duration = 1400;
+
+          function step(now) {
+            const progress = easeInOut((now - start) / duration);
+            waveWipe(currentBitmap, nextBitmap, progress);
+
+            if (progress < 1) {
+              window.requestAnimationFrame(step);
+              return;
+            }
+
+            currentView = view;
+            currentBitmap = nextBitmap;
+            isAnimating = false;
+            drawBitmap(currentBitmap);
+          }
+
+          window.requestAnimationFrame(step);
+        }
+
+        navLinks.forEach((link) => {
+          link.addEventListener("click", (event) => {
+            event.preventDefault();
+            switchView(link.dataset.view);
+          });
+        });
+
+        if ("ResizeObserver" in window) {
+          new ResizeObserver(() => {
+            renderCurrent();
+          }).observe(switcher);
+        } else {
+          window.addEventListener("resize", renderCurrent);
+        }
+
+        renderCurrent();
+      }
+
+      async function startPixi() {
+        if (!window.PIXI) {
+          document.getElementById("pixi-error").style.display = "block";
+          return;
+        }
+
+        const PIXI = window.PIXI;
+        const host = document.getElementById("pixi-stage");
+        const app = new PIXI.Application();
+
+        await app.init({
+          resizeTo: window,
+          backgroundAlpha: 0,
+          antialias: false,
+          resolution: Math.min(window.devicePixelRatio || 1, 2),
+          autoDensity: true,
+          preference: "webgl",
+          powerPreference: "low-power",
+        });
+
+        app.ticker.maxFPS = 45;
+        host.appendChild(app.canvas);
+
+        const world = new PIXI.Container({ label: "background-world" });
+        const grid = new PIXI.Graphics({ label: "stable-grid", roundPixels: true });
+        const stars = new PIXI.Container({ label: "pixel-stars" });
+        const rain = new PIXI.Container({ label: "code-rain" });
+        const links = new PIXI.Graphics({ label: "node-links", roundPixels: true });
+        const nodes = new PIXI.Container({ label: "network-nodes" });
+        const cursor = new PIXI.Graphics({ label: "cursor-reticle", roundPixels: true });
+
+        world.addChild(grid, stars, rain, links, nodes, cursor);
+        app.stage.addChild(world);
+
+        const palette = {
+          grid: 0xc8c0b2,
+          green: 0x6f8f70,
+          cyan: 0x6b8588,
+          amber: 0xe85f1c,
+          rose: 0xb95c34,
+          ink: 0x837c70,
+        };
+
+        const starSprites = [];
+        const rainGlyphs = [];
+        const nodeSprites = [];
+        const pointer = {
+          x: window.innerWidth * 0.72,
+          y: window.innerHeight * 0.34,
+        };
+
+        function snap(value, size) {
+          return Math.round(value / size) * size;
+        }
+
+        function strokeLine(graphics, x1, y1, x2, y2, color, alpha, width = 1) {
+          graphics
+            .moveTo(snap(x1, 2), snap(y1, 2))
+            .lineTo(snap(x2, 2), snap(y2, 2))
+            .stroke({ width, color, alpha, pixelLine: true });
+        }
+
+        function drawPixel(graphics, x, y, size, color, alpha) {
+          graphics.rect(snap(x, size), snap(y, size), size, size).fill({
+            color,
+            alpha,
+          });
+        }
+
+        function rebuild() {
+          const width = app.screen.width;
+          const height = app.screen.height;
+          const cell = width < 700 ? 18 : 24;
+
+          grid.clear();
+          for (let x = 0; x <= width + cell; x += cell) {
+            strokeLine(grid, x, 0, x, height, palette.grid, 0.22);
+          }
+          for (let y = 0; y <= height + cell; y += cell) {
+            strokeLine(grid, 0, y, width, y, palette.grid, 0.22);
+          }
+
+          stars.removeChildren();
+          starSprites.length = 0;
+          const starCount = Math.round((width * height) / 14500);
+
+          for (let i = 0; i < starCount; i++) {
+            const g = new PIXI.Graphics({ roundPixels: true });
+            const size = i % 7 === 0 ? 3 : 2;
+            const color = [palette.green, palette.cyan, palette.amber, palette.ink][i % 4];
+            g.rect(0, 0, size, size).fill({ color, alpha: 0.72 });
+            g.x = snap(Math.random() * width, 4);
+            g.y = snap(Math.random() * height, 4);
+            g.alpha = 0.10 + Math.random() * 0.20;
+            g.baseAlpha = g.alpha;
+            g.speed = 6 + Math.random() * 18;
+            stars.addChild(g);
+            starSprites.push(g);
+          }
+
+          rain.removeChildren();
+          rainGlyphs.length = 0;
+          const glyphs = ["0", "1", "/", "*", "#", "{", "}", "_"];
+          const columns = Math.ceil(width / 28);
+
+          for (let i = 0; i < columns; i++) {
+            const text = new PIXI.Text({
+              text: glyphs[i % glyphs.length],
+              style: {
+                fontFamily: "monospace",
+                fontSize: 12,
+                fill: i % 3 === 0 ? palette.green : palette.cyan,
+              },
+            });
+            text.x = i * 28 + Math.floor(Math.random() * 8);
+            text.y = Math.random() * height;
+            text.alpha = 0.035 + Math.random() * 0.075;
+            text.speed = 26 + Math.random() * 58;
+            rain.addChild(text);
+            rainGlyphs.push(text);
+          }
+
+          nodes.removeChildren();
+          nodeSprites.length = 0;
+          const nodeCount = width < 700 ? 5 : 8;
+
+          for (let i = 0; i < nodeCount; i++) {
+            const n = new PIXI.Graphics({ roundPixels: true });
+            n.rect(-4, -4, 8, 8).fill({
+              color: [palette.green, palette.cyan, palette.amber, palette.rose][i % 4],
+              alpha: 0.84,
+            });
+            n.x = width * (0.16 + Math.random() * 0.76);
+            n.y = height * (0.12 + Math.random() * 0.76);
+            n.phase = Math.random() * Math.PI * 2;
+            n.driftX = 7 + Math.random() * 11;
+            n.driftY = 5 + Math.random() * 9;
+            nodes.addChild(n);
+            nodeSprites.push(n);
+          }
+        }
+
+        function drawCursor(time) {
+          cursor.clear();
+          const x = snap(pointer.x, 6);
+          const y = snap(pointer.y, 6);
+          const pulse = 0.42 + Math.sin(time * 0.008) * 0.18;
+
+          drawPixel(cursor, x - 18, y, 6, palette.green, pulse);
+          drawPixel(cursor, x + 18, y, 6, palette.green, pulse);
+          drawPixel(cursor, x, y - 18, 6, palette.cyan, pulse);
+          drawPixel(cursor, x, y + 18, 6, palette.cyan, pulse);
+          cursor.rect(x - 6, y - 6, 12, 12).stroke({
+            width: 2,
+            color: palette.ink,
+            alpha: 0.34,
+            pixelLine: true,
+          });
+        }
+
+        window.addEventListener("pointermove", (event) => {
+          pointer.x += (event.clientX - pointer.x) * 0.42;
+          pointer.y += (event.clientY - pointer.y) * 0.42;
+        });
+
+        window.addEventListener("resize", rebuild);
+        rebuild();
+
+        app.ticker.add((ticker) => {
+          const seconds = ticker.deltaMS / 1000;
+          const time = performance.now();
+          const width = app.screen.width;
+          const height = app.screen.height;
+          const glyphs = ["0", "1", "/", "*", "#", "{", "}", "_"];
+
+          starSprites.forEach((star, index) => {
+            star.alpha = star.baseAlpha + Math.sin(time * 0.0015 + index * 0.8) * 0.16;
+            star.x -= star.speed * seconds;
+
+            if (star.x < -8) {
+              star.x = width + 8;
+              star.y = snap(Math.random() * height, 4);
+            }
+          });
+
+          rainGlyphs.forEach((glyph, index) => {
+            glyph.y += glyph.speed * seconds;
+
+            if (glyph.y > height + 24) {
+              glyph.y = -24;
+              glyph.text = glyphs[(index + Math.floor(time / 300)) % glyphs.length];
+            }
+          });
+
+          nodeSprites.forEach((node, index) => {
+            node.phase += (0.8 + index * 0.05) * seconds;
+            node.x += Math.cos(node.phase + index) * node.driftX * seconds;
+            node.y += Math.sin(node.phase * 1.4 + index) * node.driftY * seconds;
+          });
+
+          links.clear();
+          nodeSprites.forEach((from, index) => {
+            for (let next = index + 1; next < nodeSprites.length; next++) {
+              const to = nodeSprites[next];
+              const dx = from.x - to.x;
+              const dy = from.y - to.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+
+              if (dist < 190) {
+                strokeLine(
+                  links,
+                  from.x,
+                  from.y,
+                  to.x,
+                  to.y,
+                  index % 2 ? palette.cyan : palette.green,
+                  (1 - dist / 190) * 0.08,
+                );
+              }
+            }
+          });
+
+          grid.alpha = Math.floor(time / 900) % 2 === 0 ? 0.58 : 0.44;
+          drawCursor(time);
+        });
+      }
+
+      startHeroHtmlCanvas();
+      startContentSwitcher();
+
+      startPixi().catch(() => {
+        document.getElementById("pixi-error").style.display = "block";
+      });
+    </script>
+  </body>
+</html>
