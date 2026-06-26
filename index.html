@@ -505,6 +505,309 @@
         font-size: 12px;
       }
 
+      .glass-lab {
+        display: grid;
+        gap: 16px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        background:
+          linear-gradient(135deg, rgba(255, 252, 244, 0.78), rgba(226, 218, 204, 0.88)),
+          var(--panel-solid);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+      }
+
+      .glass-lab .section-head h2 {
+        color: var(--green);
+      }
+
+      .glass-workbench {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 238px;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .glass-scene {
+        position: relative;
+        height: clamp(360px, 44vw, 430px);
+        min-height: 360px;
+        overflow: hidden;
+        border: 1px solid rgba(45, 42, 36, 0.26);
+        background: #15120f;
+      }
+
+      #glass-lab-canvas,
+      #glass-fallback-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        grid-template-areas: "stack";
+        background:
+          linear-gradient(120deg, rgba(47, 125, 88, 0.22), transparent 36%),
+          linear-gradient(245deg, rgba(232, 95, 28, 0.22), transparent 42%),
+          #15120f;
+      }
+
+      #glass-fallback-canvas {
+        z-index: 2;
+        display: none;
+      }
+
+      .glass-lab.is-fallback #glass-lab-canvas {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .glass-lab.is-fallback #glass-fallback-canvas {
+        display: block;
+      }
+
+      #glass-bg-layer,
+      #glass-panel {
+        position: absolute;
+        inset: 0;
+        font-family: "IBM Plex Mono", "Fira Code", "SFMono-Regular", Consolas,
+          "Liberation Mono", monospace;
+      }
+
+      #glass-bg-layer {
+        width: 100%;
+        height: 100%;
+        padding: 18px;
+        display: grid;
+        grid-template-columns: 1.12fr 0.88fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 12px;
+        overflow: hidden;
+      }
+
+      .glass-bg-card {
+        min-width: 0;
+        min-height: 0;
+        padding: 14px;
+        border: 1px solid rgba(255, 252, 244, 0.18);
+        border-radius: 8px;
+        color: #fff8ec;
+        overflow: hidden;
+      }
+
+      .glass-bg-card h3 {
+        margin: 0 0 8px;
+        font-size: 15px;
+        line-height: 1.2;
+      }
+
+      .glass-bg-card p {
+        margin: 0;
+        color: rgba(255, 248, 236, 0.66);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .glass-bg-card.signal-card {
+        background:
+          repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 16px),
+          linear-gradient(135deg, #203f30, #101d17);
+      }
+
+      .glass-bg-card.render-card {
+        background:
+          linear-gradient(135deg, rgba(232, 95, 28, 0.42), transparent),
+          #281b15;
+      }
+
+      .glass-bg-card.stack-card {
+        background:
+          linear-gradient(135deg, rgba(71, 107, 114, 0.58), transparent 62%),
+          #171d1f;
+      }
+
+      .glass-bg-card.status-card {
+        background:
+          linear-gradient(135deg, rgba(155, 74, 44, 0.48), transparent 58%),
+          #241a16;
+      }
+
+      .glass-meter {
+        height: 8px;
+        margin-top: 14px;
+        border: 1px solid rgba(255, 252, 244, 0.22);
+        background: rgba(0, 0, 0, 0.22);
+      }
+
+      .glass-meter span {
+        display: block;
+        height: 100%;
+        background: linear-gradient(90deg, #6f8f70, #e85f1c);
+      }
+
+      .glass-ticks {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        height: 68px;
+        align-items: end;
+        margin-top: 10px;
+      }
+
+      .glass-ticks span {
+        display: block;
+        min-height: 8px;
+        background: linear-gradient(180deg, #e85f1c, #6f8f70);
+      }
+
+      #glass-panel {
+        --glass-panel-x: 260px;
+        --glass-panel-y: 96px;
+        inset: auto auto auto 0;
+        width: 232px;
+        align-self: start;
+        justify-self: start;
+        transform: translate(var(--glass-panel-x), var(--glass-panel-y));
+        cursor: grab;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      #glass-panel.dragging {
+        cursor: grabbing;
+      }
+
+      .glass-panel-inner {
+        display: grid;
+        gap: 12px;
+        padding: 14px;
+        border-radius: 8px;
+        color: #fff8ec;
+      }
+
+      .glass-grip {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+      }
+
+      .glass-grip span {
+        width: 16px;
+        height: 3px;
+        background: rgba(255, 248, 236, 0.34);
+      }
+
+      .glass-panel-title {
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.2;
+        text-align: center;
+      }
+
+      .glass-panel-copy {
+        margin: 0;
+        color: rgba(255, 248, 236, 0.66);
+        font-size: 11px;
+        line-height: 1.5;
+        text-align: center;
+      }
+
+      .glass-toggle-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 7px;
+      }
+
+      .glass-toggle {
+        display: grid;
+        gap: 5px;
+        justify-items: center;
+        padding: 9px 4px;
+        border: 1px solid rgba(255, 248, 236, 0.12);
+        border-radius: 8px;
+        background: rgba(255, 248, 236, 0.08);
+        font-size: 10px;
+      }
+
+      .glass-toggle b {
+        display: grid;
+        place-items: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        background: rgba(232, 95, 28, 0.26);
+        color: #fff8ec;
+      }
+
+      .glass-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        color: #b9d3ba;
+        font-size: 11px;
+      }
+
+      .glass-badge::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        background: #6f8f70;
+        box-shadow: 0 0 10px rgba(111, 143, 112, 0.6);
+      }
+
+      .glass-controls {
+        display: grid;
+        gap: 14px;
+        padding: 14px;
+        border: 1px solid rgba(45, 42, 36, 0.22);
+        background: rgba(255, 252, 244, 0.54);
+      }
+
+      .glass-control {
+        display: grid;
+        gap: 7px;
+      }
+
+      .glass-control label,
+      .glass-status {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .glass-mode-buttons {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 7px;
+      }
+
+      .glass-mode {
+        min-height: 34px;
+        border: 1px solid rgba(45, 42, 36, 0.24);
+        border-radius: 8px;
+        background: rgba(255, 252, 244, 0.62);
+        color: var(--ink);
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .glass-mode.active {
+        border-color: rgba(232, 95, 28, 0.76);
+        background: rgba(232, 95, 28, 0.12);
+        color: var(--amber);
+        font-weight: 700;
+      }
+
+      .glass-control input[type="range"] {
+        width: 100%;
+        accent-color: var(--amber);
+      }
+
+      .glass-status {
+        padding-top: 10px;
+        border-top: 1px dashed rgba(45, 42, 36, 0.22);
+      }
+
       .footer {
         padding: 0;
         color: var(--muted);
@@ -573,6 +876,15 @@
         .grid-two {
           grid-template-columns: 1fr;
         }
+
+        .glass-workbench {
+          grid-template-columns: 1fr;
+        }
+
+        #glass-bg-layer {
+          grid-template-columns: 1fr 1fr;
+          padding: 14px;
+        }
       }
 
       @media (max-width: 520px) {
@@ -611,6 +923,19 @@
         .command {
           font-size: 12px;
         }
+
+        .glass-lab {
+          padding: 14px;
+        }
+
+        .glass-scene {
+          height: 430px;
+        }
+
+        #glass-bg-layer {
+          grid-template-columns: 1fr;
+          grid-template-rows: repeat(4, minmax(96px, 1fr));
+        }
       }
     </style>
   </head>
@@ -633,6 +958,7 @@
             <a href="#projects" data-view="projects"><span>projects</span><code>02</code></a>
             <a href="#stack" data-view="stack"><span>stack</span><code>03</code></a>
             <a href="#contact" data-view="contact"><span>contact</span><code>04</code></a>
+            <a href="#glass-lab"><span>glass lab</span><code>05</code></a>
           </nav>
 
           <div class="status">
@@ -779,6 +1105,93 @@
                   </ul>
                 </div>
               </section>
+            </div>
+          </section>
+
+          <section class="glass-lab" id="glass-lab" aria-label="Liquid glass canvas lab">
+            <div class="section-head">
+              <h2>Liquid Glass Lab</h2>
+              <span>HTML-in-canvas compositor</span>
+            </div>
+
+            <div class="glass-workbench">
+              <div class="glass-scene" id="glass-scene">
+                <canvas id="glass-lab-canvas" aria-label="Liquid glass canvas output">
+                  <div id="glass-bg-layer">
+                    <article class="glass-bg-card signal-card">
+                      <h3>Signal Field</h3>
+                      <p>Telemetry cards sit behind a live frosted surface.</p>
+                      <div class="glass-meter"><span style="width: 78%"></span></div>
+                    </article>
+                    <article class="glass-bg-card render-card">
+                      <h3>Render Queue</h3>
+                      <p>Canvas samples the DOM layer, blurs it, then returns the panel content.</p>
+                      <div class="glass-ticks" aria-hidden="true">
+                        <span style="height: 34%"></span>
+                        <span style="height: 62%"></span>
+                        <span style="height: 48%"></span>
+                        <span style="height: 82%"></span>
+                        <span style="height: 56%"></span>
+                        <span style="height: 70%"></span>
+                        <span style="height: 44%"></span>
+                      </div>
+                    </article>
+                    <article class="glass-bg-card stack-card">
+                      <h3>Layer Stack</h3>
+                      <p>Background HTML, filtered pixels, glass shell, foreground HTML.</p>
+                      <div class="glass-meter"><span style="width: 64%"></span></div>
+                    </article>
+                    <article class="glass-bg-card status-card">
+                      <h3>Frame State</h3>
+                      <p>Pointer movement shifts the refractive sample under the panel.</p>
+                      <div class="glass-meter"><span style="width: 88%"></span></div>
+                    </article>
+                  </div>
+
+                  <div id="glass-panel">
+                    <div class="glass-panel-inner">
+                      <div class="glass-grip" aria-hidden="true"><span></span><span></span><span></span></div>
+                      <h3 class="glass-panel-title">Frosted Control</h3>
+                      <p class="glass-panel-copy">DOM content returns after the blur pass, keeping the panel sharp.</p>
+                      <div class="glass-toggle-grid" aria-label="Panel toggles">
+                        <span class="glass-toggle"><b>01</b>scan</span>
+                        <span class="glass-toggle"><b>02</b>mix</span>
+                        <span class="glass-toggle"><b>03</b>ship</span>
+                      </div>
+                      <div class="glass-badge">stable signal</div>
+                    </div>
+                  </div>
+                </canvas>
+                <canvas id="glass-fallback-canvas" aria-hidden="true"></canvas>
+              </div>
+
+              <div class="glass-controls" id="glass-controls">
+                <div class="glass-control">
+                  <label>Blur mode</label>
+                  <div class="glass-mode-buttons" role="group" aria-label="Blur mode">
+                    <button class="glass-mode active" type="button" data-glass-mode="gaussian">Gaussian</button>
+                    <button class="glass-mode" type="button" data-glass-mode="directional">Directional</button>
+                    <button class="glass-mode" type="button" data-glass-mode="tilt">Tilt shift</button>
+                  </div>
+                </div>
+                <div class="glass-control">
+                  <label for="glass-radius">Radius</label>
+                  <input id="glass-radius" type="range" min="4" max="26" value="14" />
+                </div>
+                <div class="glass-control">
+                  <label for="glass-angle">Angle</label>
+                  <input id="glass-angle" type="range" min="-60" max="60" value="18" />
+                </div>
+                <div class="glass-control">
+                  <label for="glass-focus">Focus</label>
+                  <input id="glass-focus" type="range" min="0" max="100" value="50" />
+                </div>
+                <div class="glass-control">
+                  <label for="glass-tint">Tint</label>
+                  <input id="glass-tint" type="range" min="0" max="70" value="28" />
+                </div>
+                <div class="glass-status" id="glass-status">initializing compositor</div>
+              </div>
             </div>
           </section>
         </main>
@@ -1437,6 +1850,558 @@
         renderCurrent();
       }
 
+      function startGlassLab() {
+        const lab = document.getElementById("glass-lab");
+        const scene = document.getElementById("glass-scene");
+        const nativeCanvas = document.getElementById("glass-lab-canvas");
+        const fallbackCanvas = document.getElementById("glass-fallback-canvas");
+        const bgLayer = document.getElementById("glass-bg-layer");
+        const panel = document.getElementById("glass-panel");
+        const controls = document.getElementById("glass-controls");
+        const status = document.getElementById("glass-status");
+
+        if (!lab || !scene || !nativeCanvas || !fallbackCanvas || !bgLayer || !panel || !controls || !status) {
+          return;
+        }
+
+        const nativeCtx = nativeCanvas.getContext("2d", { alpha: true, willReadFrequently: true });
+        const fallbackCtx = fallbackCanvas.getContext("2d", { alpha: true, willReadFrequently: true });
+        const scratchCanvas = document.createElement("canvas");
+        const scratchCtx = scratchCanvas.getContext("2d", { willReadFrequently: true });
+        const blurCanvas = document.createElement("canvas");
+        const blurCtx = blurCanvas.getContext("2d");
+        const nativeOptIn = new URLSearchParams(window.location.search).get("htmlcanvas") === "1";
+        const supportsNative =
+          nativeOptIn &&
+          Boolean(nativeCtx) &&
+          typeof nativeCtx.drawElementImage === "function" &&
+          typeof nativeCanvas.requestPaint === "function";
+
+        if (!nativeCtx || !fallbackCtx || !scratchCtx || !blurCtx) {
+          status.textContent = "canvas unavailable";
+          return;
+        }
+
+        const glass = {
+          mode: "gaussian",
+          radius: 14,
+          angle: 18,
+          focus: 0.5,
+          tint: 0.28,
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0,
+          dpr: 1,
+          dragging: false,
+          dragDx: 0,
+          dragDy: 0,
+          renderQueued: false,
+        };
+
+        if (supportsNative) {
+          nativeCanvas.setAttribute("layoutsubtree", "");
+        } else {
+          nativeCanvas.removeAttribute("layoutsubtree");
+        }
+
+        lab.classList.toggle("has-native", supportsNative);
+        lab.classList.toggle("is-fallback", !supportsNative);
+        status.textContent = supportsNative ? "native drawElementImage" : "stable canvas fallback";
+
+        function clamp(value, min, max) {
+          return Math.max(min, Math.min(max, value));
+        }
+
+        function panelSize() {
+          if (glass.width && glass.width < 560) {
+            return {
+              width: Math.min(232, Math.max(204, glass.width - 84)),
+              height: 188,
+            };
+          }
+
+          return {
+            width: Math.max(232, panel.offsetWidth || 232),
+            height: Math.max(218, panel.offsetHeight || 218),
+          };
+        }
+
+        function roundPath(context, x, y, width, height, radius) {
+          const r = Math.min(radius, width / 2, height / 2);
+          context.beginPath();
+          context.moveTo(x + r, y);
+          context.arcTo(x + width, y, x + width, y + height, r);
+          context.arcTo(x + width, y + height, x, y + height, r);
+          context.arcTo(x, y + height, x, y, r);
+          context.arcTo(x, y, x + width, y, r);
+          context.closePath();
+        }
+
+        function setPanelPosition(x, y) {
+          const size = panelSize();
+          glass.x = clamp(x, 12, Math.max(12, glass.width - size.width - 12));
+          glass.y = clamp(y, 12, Math.max(12, glass.height - size.height - 12));
+          panel.style.setProperty("--glass-panel-x", `${Math.round(glass.x)}px`);
+          panel.style.setProperty("--glass-panel-y", `${Math.round(glass.y)}px`);
+        }
+
+        function resizeGlass() {
+          const rect = scene.getBoundingClientRect();
+          const nextWidth = Math.max(320, Math.round(rect.width));
+          const nextHeight = Math.max(360, Math.round(rect.height));
+          const nextDpr = Math.min(window.devicePixelRatio || 1, 2);
+          const changed = glass.width !== nextWidth || glass.height !== nextHeight || glass.dpr !== nextDpr;
+
+          if (!changed) {
+            return false;
+          }
+
+          glass.width = nextWidth;
+          glass.height = nextHeight;
+          glass.dpr = nextDpr;
+
+          [nativeCanvas, fallbackCanvas].forEach((canvas) => {
+            canvas.width = Math.round(glass.width * glass.dpr);
+            canvas.height = Math.round(glass.height * glass.dpr);
+            canvas.style.height = `${glass.height}px`;
+          });
+
+          nativeCtx.setTransform(glass.dpr, 0, 0, glass.dpr, 0, 0);
+          fallbackCtx.setTransform(glass.dpr, 0, 0, glass.dpr, 0, 0);
+
+          if (glass.x === 0 && glass.y === 0) {
+            if (glass.width < 560) {
+              setPanelPosition((glass.width - panelSize().width) / 2, glass.height * 0.18);
+            } else {
+              setPanelPosition(glass.width * 0.58, glass.height * 0.28);
+            }
+          } else {
+            setPanelPosition(glass.x, glass.y);
+          }
+
+          return true;
+        }
+
+        function drawBlurredRegion(sourceCanvas) {
+          const size = panelSize();
+          const dpr = glass.dpr;
+          const sx = Math.round(glass.x * dpr);
+          const sy = Math.round(glass.y * dpr);
+          const sw = Math.round(size.width * dpr);
+          const sh = Math.round(size.height * dpr);
+
+          scratchCanvas.width = sw;
+          scratchCanvas.height = sh;
+          blurCanvas.width = sw;
+          blurCanvas.height = sh;
+          scratchCtx.clearRect(0, 0, sw, sh);
+          scratchCtx.drawImage(sourceCanvas, sx, sy, sw, sh, 0, 0, sw, sh);
+          blurCtx.clearRect(0, 0, sw, sh);
+
+          if (glass.mode === "directional") {
+            const angle = (glass.angle * Math.PI) / 180;
+            const blur = Math.max(1, glass.radius * dpr * 0.36);
+            const distance = glass.radius * dpr * 1.4;
+            blurCtx.filter = `blur(${blur}px) saturate(1.45) contrast(1.08)`;
+            blurCtx.globalAlpha = 1 / 7;
+
+            for (let i = -3; i <= 3; i++) {
+              blurCtx.drawImage(
+                scratchCanvas,
+                Math.cos(angle) * distance * i * 0.28,
+                Math.sin(angle) * distance * i * 0.28,
+              );
+            }
+
+            blurCtx.globalAlpha = 1;
+            blurCtx.filter = "none";
+            return;
+          }
+
+          blurCtx.filter = `blur(${glass.radius * dpr}px) saturate(1.45) contrast(1.08)`;
+          blurCtx.drawImage(scratchCanvas, 0, 0);
+          blurCtx.filter = "none";
+
+          if (glass.mode === "tilt") {
+            const focusY = sh * glass.focus;
+            const band = sh * 0.24;
+            blurCtx.save();
+            blurCtx.beginPath();
+            blurCtx.rect(0, focusY - band * 0.5, sw, band);
+            blurCtx.clip();
+            blurCtx.globalAlpha = 0.46;
+            blurCtx.filter = `blur(${Math.max(1, glass.radius * dpr * 0.24)}px) saturate(1.3)`;
+            blurCtx.drawImage(scratchCanvas, 0, 0);
+            blurCtx.restore();
+            blurCtx.filter = "none";
+            blurCtx.globalAlpha = 1;
+          }
+        }
+
+        function drawGlassSurface(context, sourceCanvas) {
+          const size = panelSize();
+          const now = performance.now() * 0.001;
+
+          drawBlurredRegion(sourceCanvas);
+
+          context.save();
+          roundPath(context, glass.x, glass.y, size.width, size.height, 8);
+          context.clip();
+          context.drawImage(blurCanvas, 0, 0, blurCanvas.width, blurCanvas.height, glass.x, glass.y, size.width, size.height);
+
+          const fill = context.createLinearGradient(glass.x, glass.y, glass.x + size.width, glass.y + size.height);
+          fill.addColorStop(0, `rgba(255, 252, 244, ${0.16 + glass.tint * 0.42})`);
+          fill.addColorStop(0.46, `rgba(111, 143, 112, ${0.05 + glass.tint * 0.16})`);
+          fill.addColorStop(1, `rgba(232, 95, 28, ${0.06 + glass.tint * 0.18})`);
+          context.fillStyle = fill;
+          context.fillRect(glass.x, glass.y, size.width, size.height);
+
+          context.globalCompositeOperation = "screen";
+          context.strokeStyle = "rgba(255, 252, 244, 0.26)";
+          context.lineWidth = 12;
+          context.beginPath();
+          context.moveTo(glass.x - 20, glass.y + size.height * 0.18);
+          context.bezierCurveTo(
+            glass.x + size.width * 0.26,
+            glass.y + Math.sin(now) * 18,
+            glass.x + size.width * 0.66,
+            glass.y + size.height * 0.22 + Math.cos(now * 0.8) * 14,
+            glass.x + size.width + 18,
+            glass.y + size.height * 0.12,
+          );
+          context.stroke();
+          context.globalCompositeOperation = "source-over";
+          context.restore();
+
+          context.save();
+          roundPath(context, glass.x + 0.5, glass.y + 0.5, size.width - 1, size.height - 1, 8);
+          context.strokeStyle = "rgba(255, 252, 244, 0.58)";
+          context.lineWidth = 1.2;
+          context.stroke();
+          roundPath(context, glass.x + 3, glass.y + 3, size.width - 6, size.height - 6, 6);
+          context.strokeStyle = "rgba(45, 42, 36, 0.22)";
+          context.lineWidth = 1;
+          context.stroke();
+          context.restore();
+        }
+
+        function drawNative() {
+          resizeGlass();
+          nativeCtx.setTransform(1, 0, 0, 1, 0, 0);
+          nativeCtx.clearRect(0, 0, nativeCanvas.width, nativeCanvas.height);
+          nativeCtx.setTransform(glass.dpr, 0, 0, glass.dpr, 0, 0);
+
+          try {
+            nativeCtx.drawElementImage(bgLayer, 0, 0, glass.width, glass.height);
+            drawGlassSurface(nativeCtx, nativeCanvas);
+            const size = panelSize();
+            nativeCtx.drawElementImage(panel, glass.x, glass.y, size.width, size.height);
+          } catch (error) {
+            lab.classList.remove("has-native");
+            lab.classList.add("is-fallback");
+            status.textContent = "canvas fallback";
+            requestRender();
+          }
+        }
+
+        function drawWrapped(context, text, x, y, maxWidth, lineHeight, maxLines) {
+          const words = text.split(/\s+/).filter(Boolean);
+          const lines = [];
+          let line = "";
+
+          words.forEach((word) => {
+            const test = line ? `${line} ${word}` : word;
+
+            if (context.measureText(test).width > maxWidth && line) {
+              lines.push(line);
+              line = word;
+            } else {
+              line = test;
+            }
+          });
+
+          if (line) {
+            lines.push(line);
+          }
+
+          lines.slice(0, maxLines).forEach((lineText, index) => {
+            let output = lineText;
+
+            while (context.measureText(output).width > maxWidth && output.length > 1) {
+              output = output.slice(0, -1);
+            }
+
+            if (index === maxLines - 1 && lines.length > maxLines) {
+              output = `${output.slice(0, Math.max(1, output.length - 3))}...`;
+            }
+
+            context.fillText(output, x, y + index * lineHeight);
+          });
+        }
+
+        function drawFallbackCard(context, x, y, width, height, title, body, colors, value) {
+          context.save();
+          roundPath(context, x, y, width, height, 8);
+          const fill = context.createLinearGradient(x, y, x + width, y + height);
+          fill.addColorStop(0, colors[0]);
+          fill.addColorStop(1, colors[1]);
+          context.fillStyle = fill;
+          context.fill();
+          context.strokeStyle = "rgba(255, 252, 244, 0.18)";
+          context.lineWidth = 1;
+          context.stroke();
+
+          context.fillStyle = "#fff8ec";
+          context.font = "700 15px monospace";
+          context.textBaseline = "top";
+          drawWrapped(context, title, x + 14, y + 14, width - 28, 18, 1);
+
+          context.fillStyle = "rgba(255, 248, 236, 0.66)";
+          context.font = "12px monospace";
+          drawWrapped(context, body, x + 14, y + 42, width - 28, 18, 3);
+
+          context.strokeStyle = "rgba(255, 252, 244, 0.22)";
+          context.strokeRect(x + 14, y + height - 26, width - 28, 8);
+          const meter = context.createLinearGradient(x + 14, y, x + width - 14, y);
+          meter.addColorStop(0, "#6f8f70");
+          meter.addColorStop(1, "#e85f1c");
+          context.fillStyle = meter;
+          context.fillRect(x + 15, y + height - 25, (width - 30) * value, 6);
+          context.restore();
+        }
+
+        function drawFallbackBackground(context) {
+          const w = glass.width;
+          const h = glass.height;
+          const base = context.createLinearGradient(0, 0, w, h);
+          base.addColorStop(0, "#102419");
+          base.addColorStop(0.54, "#15120f");
+          base.addColorStop(1, "#3a190d");
+          context.fillStyle = base;
+          context.fillRect(0, 0, w, h);
+
+          context.save();
+          context.globalAlpha = 0.18;
+          context.strokeStyle = "rgba(255, 252, 244, 0.24)";
+          context.lineWidth = 1;
+          for (let x = 0; x < w; x += 18) {
+            context.beginPath();
+            context.moveTo(x, 0);
+            context.lineTo(x, h);
+            context.stroke();
+          }
+          for (let y = 0; y < h; y += 18) {
+            context.beginPath();
+            context.moveTo(0, y);
+            context.lineTo(w, y);
+            context.stroke();
+          }
+          context.restore();
+
+          const pad = w < 560 ? 14 : 18;
+          const gap = 12;
+          const columns = w < 560 ? 1 : 2;
+          const cardWidth = columns === 1 ? w - pad * 2 : (w - pad * 2 - gap) / 2;
+          const cardHeight = columns === 1 ? (h - pad * 2 - gap * 3) / 4 : (h - pad * 2 - gap) / 2;
+          const cards = [
+            ["Signal Field", "Telemetry cards sit behind a live frosted surface.", ["#203f30", "#101d17"], 0.78],
+            ["Render Queue", "Canvas samples the layer, blurs it, then returns panel content.", ["#4a2415", "#18100d"], 0.68],
+            ["Layer Stack", "Background HTML, filtered pixels, glass shell, foreground HTML.", ["#23383c", "#141c1d"], 0.64],
+            ["Frame State", "Pointer movement shifts the refractive sample under the panel.", ["#3d2018", "#1d1310"], 0.88],
+          ];
+
+          cards.forEach((card, index) => {
+            const col = columns === 1 ? 0 : index % 2;
+            const row = columns === 1 ? index : Math.floor(index / 2);
+            const x = pad + col * (cardWidth + gap);
+            const y = pad + row * (cardHeight + gap);
+            drawFallbackCard(context, x, y, cardWidth, cardHeight, card[0], card[1], card[2], card[3]);
+          });
+        }
+
+        function drawFallbackPanel(context) {
+          const size = panelSize();
+          const x = glass.x;
+          const y = glass.y;
+          const inner = 14;
+
+          context.save();
+          context.fillStyle = "rgba(255, 248, 236, 0.38)";
+          for (let i = 0; i < 3; i++) {
+            context.fillRect(x + size.width / 2 - 28 + i * 20, y + 12, 16, 3);
+          }
+
+          context.fillStyle = "#fff8ec";
+          context.font = "700 16px monospace";
+          context.textAlign = "center";
+          context.textBaseline = "top";
+          context.fillText("Frosted Control", x + size.width / 2, y + 34);
+
+          context.fillStyle = "rgba(255, 248, 236, 0.68)";
+          context.font = "11px monospace";
+          context.textAlign = "left";
+          drawWrapped(
+            context,
+            "DOM content returns after the blur pass, keeping the panel sharp.",
+            x + inner,
+            y + 64,
+            size.width - inner * 2,
+            16,
+            3,
+          );
+
+          context.textAlign = "center";
+          const gap = 7;
+          const toggleY = y + 128;
+          const toggleW = (size.width - inner * 2 - gap * 2) / 3;
+          ["01", "02", "03"].forEach((label, index) => {
+            const tx = x + inner + index * (toggleW + gap);
+            roundPath(context, tx, toggleY, toggleW, 52, 8);
+            context.fillStyle = "rgba(255, 248, 236, 0.08)";
+            context.fill();
+            context.strokeStyle = "rgba(255, 248, 236, 0.12)";
+            context.stroke();
+            roundPath(context, tx + toggleW / 2 - 13, toggleY + 8, 26, 26, 8);
+            context.fillStyle = "rgba(232, 95, 28, 0.26)";
+            context.fill();
+            context.fillStyle = "#fff8ec";
+            context.font = "700 10px monospace";
+            context.fillText(label, tx + toggleW / 2, toggleY + 15);
+            context.font = "10px monospace";
+            context.fillText(["scan", "mix", "ship"][index], tx + toggleW / 2, toggleY + 38);
+          });
+
+          context.fillStyle = "#b9d3ba";
+          context.font = "11px monospace";
+          context.fillText("stable signal", x + size.width / 2, y + size.height - 24);
+          context.restore();
+        }
+
+        function drawFallback() {
+          glass.renderQueued = false;
+          resizeGlass();
+          fallbackCtx.setTransform(1, 0, 0, 1, 0, 0);
+          fallbackCtx.clearRect(0, 0, fallbackCanvas.width, fallbackCanvas.height);
+          fallbackCtx.setTransform(glass.dpr, 0, 0, glass.dpr, 0, 0);
+
+          drawFallbackBackground(fallbackCtx);
+          drawGlassSurface(fallbackCtx, fallbackCanvas);
+          drawFallbackPanel(fallbackCtx);
+        }
+
+        function requestRender() {
+          if (supportsNative && lab.classList.contains("has-native")) {
+            nativeCanvas.requestPaint();
+            return;
+          }
+
+          if (glass.renderQueued) {
+            return;
+          }
+
+          glass.renderQueued = true;
+          drawFallback();
+        }
+
+        function pointFromEvent(event) {
+          const rect = scene.getBoundingClientRect();
+          return {
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top,
+          };
+        }
+
+        scene.addEventListener("pointerdown", (event) => {
+          const point = pointFromEvent(event);
+          const size = panelSize();
+
+          if (
+            point.x < glass.x ||
+            point.x > glass.x + size.width ||
+            point.y < glass.y ||
+            point.y > glass.y + size.height
+          ) {
+            return;
+          }
+
+          glass.dragging = true;
+          glass.dragDx = point.x - glass.x;
+          glass.dragDy = point.y - glass.y;
+          panel.classList.add("dragging");
+          scene.setPointerCapture(event.pointerId);
+          event.preventDefault();
+        });
+
+        scene.addEventListener("pointermove", (event) => {
+          if (!glass.dragging) {
+            return;
+          }
+
+          const point = pointFromEvent(event);
+          setPanelPosition(point.x - glass.dragDx, point.y - glass.dragDy);
+          requestRender();
+        });
+
+        scene.addEventListener("pointerup", (event) => {
+          glass.dragging = false;
+          panel.classList.remove("dragging");
+          scene.releasePointerCapture(event.pointerId);
+        });
+
+        controls.addEventListener("input", (event) => {
+          const target = event.target;
+
+          if (!(target instanceof HTMLInputElement)) {
+            return;
+          }
+
+          if (target.id === "glass-radius") {
+            glass.radius = Number(target.value);
+          } else if (target.id === "glass-angle") {
+            glass.angle = Number(target.value);
+          } else if (target.id === "glass-focus") {
+            glass.focus = Number(target.value) / 100;
+          } else if (target.id === "glass-tint") {
+            glass.tint = Number(target.value) / 100;
+          }
+
+          requestRender();
+        });
+
+        controls.querySelectorAll("[data-glass-mode]").forEach((button) => {
+          button.addEventListener("click", () => {
+            glass.mode = button.dataset.glassMode;
+            controls.querySelectorAll("[data-glass-mode]").forEach((item) => {
+              item.classList.toggle("active", item === button);
+            });
+            requestRender();
+          });
+        });
+
+        if (supportsNative) {
+          nativeCanvas.onpaint = drawNative;
+        }
+
+        if ("ResizeObserver" in window) {
+          new ResizeObserver(() => {
+            resizeGlass();
+            requestRender();
+          }).observe(scene);
+        } else {
+          window.addEventListener("resize", () => {
+            resizeGlass();
+            requestRender();
+          });
+        }
+
+        resizeGlass();
+        document.fonts?.ready.then(() => {
+          requestRender();
+        });
+        requestRender();
+      }
+
       async function startPixi() {
         if (!window.PIXI) {
           document.getElementById("pixi-error").style.display = "block";
@@ -1666,6 +2631,7 @@
 
       startHeroHtmlCanvas();
       startContentSwitcher();
+      startGlassLab();
 
       startPixi().catch(() => {
         document.getElementById("pixi-error").style.display = "block";
